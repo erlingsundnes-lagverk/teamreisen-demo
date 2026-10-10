@@ -9,6 +9,8 @@ Dette er demoen av **Teamreisen**, et brettspill for team: korte samtaler med di
 
 Utviklet av Lagverk.
 
+Demoen åpnes på https://erlingsundnes-lagverk.github.io/teamreisen-demo/
+
 ## Om dette repoet
 
 Filene her er ferdig bygget og skal ikke endres for hånd. De lages fra kildekoden til spillet, som ligger et annet sted. En endring gjort direkte her blir overskrevet ved neste bygging.
