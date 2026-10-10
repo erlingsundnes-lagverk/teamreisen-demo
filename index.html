@@ -582,6 +582,9 @@ details.adet>summary{font-family:var(--font-display);font-weight:700;font-size:2
 #open-tlf,#open-adm{display:none!important}
 .demonote{margin:0;padding:10px 14px;border-radius:10px;border:1.5px dashed var(--line);background:var(--surface);color:var(--muted);font-size:14.5px;line-height:1.45}
 .demonote b{color:var(--ink)}
+/* «Et spill fra Lagverk»: lenken ser ut som de andre lenkene i kreditten. */
+.kreditt a{color:var(--ink);font-weight:700;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.kreditt a:hover{text-decoration-color:var(--accent)}
 </style>
 
 <div class="wrap">
@@ -618,7 +621,7 @@ details.adet>summary{font-family:var(--font-display);font-weight:700;font-size:2
       <span class="lbl" id="open-adm-l">Eier og redaktører</span><b>Administrer</b><span class="txt">Innhold, standard for økter, data og personvern.</span>
     </button>
   </div>
-  <p class="kreditt" id="kreditt"><button type="button" class="link" id="om-spillet">Slik spiller dere</button> · <button type="button" class="link" id="om-data">Om dataene</button> · <span id="k-navn2">Teamreisen</span> er utviklet av <b id="k-utv">Lagverk</b>.</p>
+  <p class="kreditt" id="kreditt"><button type="button" class="link" id="om-spillet">Slik spiller dere</button> · <button type="button" class="link" id="om-data">Om dataene</button> · Et spill fra <a id="k-utv" href="https://lagverk.no/">Lagverk</a></p>
 </section>
 
 <!-- OM DATAENE (2.28): hva som lagres, hvem som ser det, hvor lenge og hvordan det slettes. Teksten bygges av innstillingene. -->
