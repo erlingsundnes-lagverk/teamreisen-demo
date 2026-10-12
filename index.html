@@ -276,6 +276,7 @@ button.opt:hover{border-color:var(--accent)}
 /* Forside */
 .hero{border-radius:10px;overflow:hidden;background:var(--surface-2);height:clamp(120px,19vw,240px);max-width:100%}
 .hero img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 0}
+.hero.egen img{object-position:50% 50%}
 .hlead{font-size:clamp(17px,1.35vw,22px);max-width:62ch}
 .entries{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
 .entry{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;padding:22px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);min-width:0}
@@ -344,6 +345,8 @@ button.opt:hover{border-color:var(--accent)}
 .chip.fs{background:var(--accent);color:var(--on-accent);border-color:transparent}
 details.adet>summary{font-family:var(--font-display);font-weight:700;font-size:20px}
 /* Start rett under valgt tema. Bare når «Økta» havner under temaene (smal skjerm). */
+.tkat{grid-column:1/-1;margin:8px 0 -6px;font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.tkat:first-child{margin-top:0}
 .tstart{grid-column:1/-1;display:flex;flex-direction:column;gap:10px;padding:12px 14px;margin-top:-6px;border-radius:10px;background:var(--surface);border:2px solid var(--accent)}
 .tstart .hint{max-width:none}
 @media (min-width:981px){.tstart{display:none}}
@@ -593,9 +596,9 @@ details.adet>summary{font-family:var(--font-display);font-weight:700;font-size:2
 <section id="hjem" class="screen">
   <header class="top">
     <div class="brand"><small id="k-org">teamreisen.no</small><h1 id="k-navn">Teamreisen</h1></div>
-    <div class="tools"><span class="eyebrow">Demo · versjon 2.29.2</span></div>
+    <div class="tools"><span class="eyebrow">Demo · versjon 2.29.4</span></div>
   </header>
-  <div class="hero"><img src="teamreisen-brett.jpg" alt="Spillebrettet i Teamreisen"></div>
+  <div class="hero" id="hero"><img src="teamreisen-brett.jpg" id="hero-img" alt="Spillebrettet i Teamreisen"></div>
   <div class="trband" aria-hidden="true"><svg viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0 120 L120 60 L190 92 L300 22 L420 96 L520 54 L610 84 L720 16 L840 90 L930 48 L1040 86 L1120 40 L1200 70 L1200 120Z" fill="#0F3A4A" opacity=".9"/><path d="M300 22 L330 40 L300 36 L276 44Z M720 16 L752 38 L720 32 L694 42Z" fill="#FAF4EC"/></svg><span style="background:#A6D0D1"></span><span style="background:#67A377"></span><span style="background:#FAB68A"></span><span style="background:#E98061"></span><span style="background:#F5BE5F"></span></div>
   <p class="hlead"><span id="k-ingress">Fra trygghet til læring – et sterkere team, sammen.</span> Start rett på, eller velg hva du skal gjøre.</p>
   <p class="demonote" id="demonote"><b>Dette er en demo.</b> Kortene er utkast. Alt du gjør, lagres bare i denne nettleseren. Svar fra telefon er ikke med i demoen.</p>
@@ -904,7 +907,7 @@ details.adet>summary{font-family:var(--font-display);font-weight:700;font-size:2
     <div class="tools"><button type="button" class="ghost" id="d-back">Til forsiden</button></div>
   </header>
   <div class="dfilters">
-    <label>Gruppe eller seksjon<select id="d-g"></select></label>
+    <label>Gruppe eller enhet<select id="d-g"></select></label>
     <label><span id="d-l-lbl">Lag</span><select id="d-l"></select></label>
     <div class="field"><span class="lbl">Periode</span>
       <div class="seg" role="group" aria-label="Periode" id="d-per">
@@ -1042,7 +1045,7 @@ function parseWorkbook(wb){
     if(z.length)b.soner=z});
   var themes=[],byId={};
   sh.Tema.forEach(function(r){var id=key(r.temaid);if(!id||byId[id])return;
-    var t={id:id,name:txt(r.tema)||id,desc:txt(r.beskrivelse),board:key(r.brettid),cards:[]};if(/^(nei|n|0|false|av)$/.test(norm(r.stigerogsklier)))t.nl=true;byId[id]=t;themes.push(t)});
+    var t={id:id,name:txt(r.tema)||id,desc:txt(r.beskrivelse),board:key(r.brettid),cards:[]};if(/^(nei|n|0|false|av)$/.test(norm(r.stigerogsklier)))t.nl=true;var kt=txt(r.kategori).slice(0,40);if(kt)t.kat=kt;byId[id]=t;themes.push(t)});
   sh.Kort.forEach(function(r,i){var id=key(r.temaid),t=byId[id];
     if(!t){if(id)W.push("Kort, rad "+(i+2)+": TemaID «"+txt(r.temaid)+"» finnes ikke i arket Tema.");return}
     var c={sq:null,t:txt(r.tittel)||t.name,s:txt(r.situasjon),r:txt(r["spørsmåltilalle"])||"Hva tar vi med oss fra dette?",
@@ -1104,11 +1107,11 @@ function importFiles(list){
    Uten arket gjelder standardverdiene under. Innstillingene følger biblioteket: lest inn her, husket i nettleseren og publisert til alle. */
 var KONF0={navn:"Teamreisen",org:"teamreisen.no",ingress:"Fra trygghet til læring – et sterkere team, sammen.",
   velkomst:"Én felles brikke for hele teamet. Fem soner fra trygghet og tillit til læring, med dilemmaer, refleksjoner, øvelser og avtaler underveis. Det handler om å snakke sammen, ikke om å vinne.",gruppe:"Teamet",
-  kort:"Teammøte",middels:"Teamsamling",lang:"Teamdag",kortlag:["Teamet"],korttema:"teamreisen",utvikler:"Lagverk",utseende:"teamreisen",personsvar:"",antalllag:"",feiring:"",puls:"",analyse:"",rapport:"",terskel:"",kontakt:"",lagnavn:[],seks:"",terning:"",beste:"",tilbake:""};
+  kort:"Teammøte",middels:"Teamsamling",lang:"Teamdag",kortlag:["Teamet"],korttema:"teamreisen",utvikler:"Lagverk",utseende:"teamreisen",personsvar:"",antalllag:"",feiring:"",puls:"",analyse:"",rapport:"",terskel:"",kontakt:"",lagnavn:[],seks:"",terning:"",beste:"",tilbake:"",forside:""};
 var KONFNAVN={spillnavn:"navn",organisasjon:"org",ingress:"ingress",velkomsttekst:"velkomst",standardgruppe:"gruppe",kortoppsett:"kort",middelsoppsett:"middels",
   langtoppsett:"lang",lagikortoppsett:"kortlag",temaforkortoppsett:"korttema",utvikler:"utvikler",
   utseende:"utseende",svarperperson:"personsvar",antalllag:"antalllag",feiringunderveis:"feiring",
-  pulsetterøkta:"puls",puls:"puls",kianalyseirapporten:"analyse",kianalyse:"analyse",rapportprofil:"rapport",rapport:"rapport",vissnittfra:"terskel",kontaktomdataene:"kontakt",kontakt:"kontakt",lagnavn:"lagnavn",navnpålag:"lagnavn",ekstrakastpåsekser:"seks",ekstrakastpå6:"seks",ekstrakast:"seks",terning:"terning",bestesvarflytter:"beste",svakestesvarflyttertilbake:"tilbake",svakestesvartilbake:"tilbake"};
+  pulsetterøkta:"puls",puls:"puls",kianalyseirapporten:"analyse",kianalyse:"analyse",rapportprofil:"rapport",rapport:"rapport",vissnittfra:"terskel",kontaktomdataene:"kontakt",kontakt:"kontakt",lagnavn:"lagnavn",navnpålag:"lagnavn",ekstrakastpåsekser:"seks",ekstrakastpå6:"seks",ekstrakast:"seks",terning:"terning",bestesvarflytter:"beste",svakestesvarflyttertilbake:"tilbake",svakestesvartilbake:"tilbake",forsidebilde:"forside",forside:"forside"};
 var KONF=JSON.parse(JSON.stringify(KONF0));
 function cleanKonf(r){var k={};if(!r||typeof r!=="object")return k;
   Object.keys(KONF0).forEach(function(n){var v=r[n];
@@ -1123,6 +1126,7 @@ function cleanKonf(r){var k={};if(!r||typeof r!=="object")return k;
     else if(n==="beste"){var bs=parseInt(v,10);if(bs===1||bs===2)k.beste=String(bs)}
     else if(n==="personsvar"||n==="feiring"||n==="puls"||n==="seks"||n==="tilbake"){var j=norm(v);if(j)k[n]=/^(nei|av|0|false)/.test(j)?"nei":"ja"}
     else if(n==="rapport"){var rp=norm(v);if(rp)k.rapport=rp.indexOf("leder")===0?"ledergruppe":rp.indexOf("team")===0?"team":"seksjon"}
+    else if(n==="forside"){var fb=txt(v);if(enkeltNavn(fb))k.forside=fb}
     else if(n==="antalllag"){var al=parseInt(v,10);if(al>=1&&al<=4)k.antalllag=String(al)}
     else{var t=txt(v).slice(0,n==="ingress"||n==="velkomst"?240:60);if(t)k[n]=t}});
   return k}
@@ -1134,9 +1138,13 @@ function applyKonf(){
   OPP.names=OPP.names.map(function(x,i){return x===gml[i]||NAVN_STD.indexOf(x)>=0||NAVN_NOYT.indexOf(x)>=0?NAVN[i]:x});
   OPPS.tavle.navn=KONF.kort;OPPS.seksjon.navn=KONF.middels;OPPS.fagdag.navn=KONF.lang;TAVLELAG=KONF.kortlag.slice();
   [["k-org","org"],["k-navn","navn"],["k-navn2","navn"],["splash-t","navn"],["k-ingress","ingress"],["k-velkomst","velkomst"],["k-utv","utvikler"]].forEach(function(p){var el=$(p[0]);if(el)el.textContent=KONF[p[1]]});
+  /* Forsidebilde (2.29.3): Innstillinger «Forsidebilde» = en bildefil som publiseres med siden. Uten den vises eiendomsdrifts illustrasjon som før. */
+  var hi=$("hero-img");if(hi){if(KONF.forside){if(hi.getAttribute("src")!==KONF.forside)hi.src=KONF.forside;hi.alt="";$("hero").classList.add("egen")}else{$("hero").classList.remove("egen")}}
   /* Terningen følger Innstillinger til noen velger selv i oppsettet (OPP.dvalg). */
   if(!OPP.dvalg)OPP.die=terningStd();
   if(!lsGet("stige2:oppsett")&&!oppRort){OPP.group=KONF.gruppe;if(KONF.antalllag){OPP.n=+KONF.antalllag;if(OPP.n===1)OPP.solo=dagLag()}if(KONF.feiring==="nei")OPP.merker=0}
+  /* Står gruppa fortsatt på standarden fra eiendomsdrift, og biblioteket har en annen standardgruppe, brukes bibliotekets (2.29.3). */
+  else if(OPP.group===KONF0.gruppe&&KONF.gruppe!==KONF0.gruppe)OPP.group=KONF.gruppe;
   var pf=KONF.utseende==="teamreisen"?"teamreisen":"standard";document.documentElement.setAttribute("data-profil",pf);try{localStorage.setItem("stige2:profil",pf)}catch(e){}
 }
 /* Utseendet huskes, så siden ikke blinker i standardfarger før biblioteket er lastet. */
@@ -1187,9 +1195,17 @@ function renderSetup(){
   $("tema-hint").textContent=LIB.src==="felles"?"Felles temabibliotek, publisert "+fmtTid(LIB.when)+".":LIB.src==="excel"?"Hentet fra "+LIB.file+(canHist()?". Ikke publisert til andre ennå.":"."):"Demo: kortene er utkast.";
   renderThemes();renderOkt();renderLib();renderModes();renderQuick();
 }
+/* Kategorier (2.29.3): kolonnen Kategori i arket Tema. Har minst ett tema en kategori, vises temaene gruppert,
+   i rekkefølgen kategoriene først står i Excel-fila. Tema uten kategori kommer sist, under «Andre tema». */
+function katGrupper(ths){
+  if(!ths.some(function(t){return t.kat}))return [{navn:"",tema:ths}];
+  var rek=[],by={};
+  ths.forEach(function(t){var k=t.kat||"";if(!by[k]){by[k]=[];rek.push(k)}by[k].push(t)});
+  rek.sort(function(a,b){return (a===""?1:0)-(b===""?1:0)});
+  return rek.map(function(k){return{navn:k||"Andre tema",tema:by[k]}})}
 function renderThemes(){
   var ths=usableThemes(),fs=forslag();
-  $("themes").innerHTML=ths.length?ths.map(function(t){
+  $("themes").innerHTML=ths.length?katGrupper(ths).map(function(gr){return (gr.navn?'<h3 class="tkat">'+esc(gr.navn)+"</h3>":"")+gr.tema.map(function(t){
     var b=effBoard(t,OPP.brett),g=loadGame(t.id),chip="";
     if(g&&g.phase==="won")chip='<span class="chip done">Fullført</span>';
     else if(g&&avsluttet(g))chip='<span class="chip">Økt avsluttet</span>';
@@ -1198,7 +1214,7 @@ function renderThemes(){
     else if(t.example)chip='<span class="chip">Eksempel</span>';
     return '<button type="button" class="theme'+(t.id===OPP.theme?" on":"")+'" data-tema="'+esc(t.id)+'" aria-pressed="'+(t.id===OPP.theme)+'">'+
       '<span class="thumb"><img src="'+esc(imgUrl(b,t))+'" alt=""></span><span class="tbody"><b>'+esc(t.name)+"</b>"+(t.desc?"<span>"+esc(t.desc)+"</span>":"")+
-      "<small>"+t.cards.length+" kort"+(godkjente(t)<t.cards.length?" ("+godkjente(t)+" godkjent)":"")+" · "+esc(b.name)+nyeFor(t)+"</small></span>"+chip+"</button>"+(t.id===OPP.theme?tStart(t):"")}).join("")
+      "<small>"+t.cards.length+" kort"+(godkjente(t)<t.cards.length?" ("+godkjente(t)+" godkjent)":"")+" · "+esc(b.name)+nyeFor(t)+"</small></span>"+chip+"</button>"+(t.id===OPP.theme?tStart(t):"")}).join("")}).join("")
     :'<p class="empty">Ingen tema kan vises ennå. Illustrasjonen til temaene mangler på denne enheten.</p>';
 }
 function tStart(t){
@@ -1260,7 +1276,7 @@ function renderOkt(onlyRest){
   var lagfelt=keep?'<p class="hint">Lagene fra spillet som pågår, beholdes.</p>':'<div class="field"><span class="lbl">Antall lag</span><div class="stepper"><button type="button" id="n-minus" data-n="-1" aria-label="Færre lag"'+(OPP.n<=1?" disabled":"")+">−</button>"+
       '<output id="n-out">'+OPP.n+'</output><button type="button" id="n-plus" data-n="1" aria-label="Flere lag"'+(OPP.n>=4?" disabled":"")+">+</button></div>"+
       '<div class="names">'+teamNames().map(function(nm,i){return '<label><span class="dot t'+(i+1)+'"></span><input id="lagnavn-'+i+'" data-i="'+i+'" maxlength="24" value="'+esc(nm)+'" aria-label="Navn på lag '+(i+1)+'"></label>'}).join("")+"</div></div>";
-  var ng=godkjente(t),nk=t.cards.length,eb=LIB.boards[t.board],kanTegne=(eb.tegnet&&!eget(eb))||eb.pts.length===23,ttegn=kanTegne&&t.nl,blokk=!OPP.utkast&&!ng;
+  var ng=godkjente(t),nk=t.cards.length,eb=LIB.boards[t.board],kanTegne=(eb.tegnet&&!eget(eb))||eb.pts.length===23,ttegn=kanTegne&&(nlTegnet(t,eb)||(eb.tegnet&&!fellesBrett())),blokk=!OPP.utkast&&!ng;
   h+='<div class="field"><span class="lbl">Oppsett</span>'+oppsSeg("oppsett-")+'</div><p class="hint" id="opps-hint">'+OPPS[curOpps()].txt+"</p>"+lagValg("lag-",keep);
   h+='<p class="hint" id="okt-tid">'+(OPP.rounds?(n>1?n+" lag × "+OPP.rounds+(OPP.rounds===1?" runde":" runder")+" = "+k+" kort. ":"Ett lag, "+k+" kort. ")+"Ca. "+minutter(k,n)+" minutter.":(n>1?"Dere spiller til første lag er i mål.":"Dere spiller til laget er i mål."))+
      (OPP.rounds?" Spillet lagres og fortsetter neste gang.":"")+(OPP.die===0?" Uten terning, én rute om gangen":" Terning "+(OPP.die===6?"1 til 6"+(ekstraKast()?", sekser gir ett nytt kast":""):"1 til 3"))+(OPP.timer?", "+(OPP.timer/60)+" min diskusjon per kort":"")+".</p>";
@@ -1279,7 +1295,7 @@ function renderOkt(onlyRest){
     segHTML("Diskusjonstid per kort","timer",[[0,"Ingen"],[60,"1 min"],[120,"2 min"],[180,"3 min"]])+
     '<h3 class="mgrp">Innhold og regler</h3>'+
     (ttegn?"":segHTML("Brett","brett",[[1,"Illustrert"],[0,"Tegnet"]]))+'<p class="hint" id="brett-hint">'+
-    (ttegn?"Temaet spilles uten stiger og sklier. Spillet tegner derfor brettet selv, med temaets navn og kortenes titler i rutene.":!kanTegne?"Temaet har eget brett med "+(eb.pts.length-2)+" ruter. Det tegnede brettet har 21 ruter, så temaet bruker sitt eget.":
+    (ttegn?(t.nl?"Temaet spilles uten stiger og sklier. Spillet tegner derfor brettet selv, med temaets navn og kortenes titler i rutene.":"Brettet spillet tegner selv, med temaets navn og kortenes titler i rutene."):!kanTegne?"Temaet har eget brett med "+(eb.pts.length-2)+" ruter. Det tegnede brettet har 21 ruter, så temaet bruker sitt eget.":
      OPP.brett?(eb.tegnet?"Det felles illustrerte brettet «"+esc(fellesBrett().name)+"». Stigene og skliene er de samme.":"Temaets illustrasjon «"+esc(eb.name)+"»."):
      "Brettet spillet tegner selv, med temaets navn og kortenes titler i rutene.")+"</p>"+
     segHTML("Kort","utkast",[[1,"Også utkast"],[0,"Bare godkjente"]])+'<p class="hint'+(blokk?" err":"")+'" id="utkast-hint">'+(ng===nk?"Alle "+nk+" kortene er godkjent.":
@@ -1346,12 +1362,18 @@ function curTheme(){return theme(S.theme)}
    Tegnet: det tegnede brettet med temaets navn og kortenes titler, når temaets brett har 21 ruter; ellers temaets eget brett.
    Stigene og skliene følger alltid temaets brett. */
 var EFF={};
-function fellesBrett(){var b=LIB.boards.eiendomsdrift;
-  if(b&&!b.tegnet&&b.pts.length===23&&(b.img||BLOBS[b.id]))return b;
+/* Det felles illustrerte brettet er eiendomsdrifts illustrasjon. Det brukes bare når biblioteket har brettet
+   eiendomsdrift (2.29.3). Andre bibliotek, som den generelle malen, får det tegnede brettet. */
+function fellesBrett(){var b=LIB.boards.eiendomsdrift;if(!b)return null;
+  if(!b.tegnet&&b.pts.length===23&&(b.img||BLOBS[b.id]))return b;
   var d=BUILT.eiendomsdrift;if(!d)return b||{};var c=JSON.parse(JSON.stringify(d));c.img=BUILTIN_IMG;return c}
+/* Brett med stiger og sklier tegnet inn i selve illustrasjonen. Bare eiendomsdrifts brett har det; nye brett (som Fjordbyen)
+   har en tom vei, og spillet legger stigene oppå. Et tema uten stiger og sklier kan derfor bruke dem som de er (2.29.3). */
+function malteStiger(b){return !!b&&b.id==="eiendomsdrift"}
+function nlTegnet(t,b){return !!(t&&t.nl)&&(b.tegnet||malteStiger(b))}
 function effBoard(t,mode){var b=t&&LIB.boards[t.board];if(!b)return b;
   /* Tema uten stiger og sklier (t.nl): illustrasjonene har stiger og sklier tegnet inn, så brettet tegnes alltid (2.29.2). */
-  if(t.nl&&mode!==0&&b.pts.length===23&&!eget(b))mode=0;
+  if(mode!==0&&b.pts.length===23&&!eget(b)&&(nlTegnet(t,b)||(b.tegnet&&!fellesBrett())))mode=0;
   var k=b.id+"|"+mode+"|"+(LIB.when||0);
   if(mode===0){if(b.tegnet||b.pts.length!==23)return b;
     return EFF[k]||(EFF[k]={id:"generelt~"+b.id,name:"Generelt brett",file:"",tegnet:true,pts:genPts(),lenker:bLenker(b)})}
@@ -2208,10 +2230,10 @@ function hRow(e){var d=new Date(e.ts),z=function(n){return("0"+n).slice(-2)};
 function groupField(){
   if(STD&&STD.grupper.length){
     var cur=gk(OPP.group);
-    return '<div class="field"><label class="lbl" for="gruppe">Gruppe eller seksjon</label><select id="gruppe" class="ginp">'+STD.grupper.map(function(g){return '<option value="'+esc(g.navn)+'"'+(gk(g.navn)===cur?" selected":"")+">"+esc(g.navn)+"</option>"}).join("")+"</select></div>";
+    return '<div class="field"><label class="lbl" for="gruppe">Gruppe eller enhet</label><select id="gruppe" class="ginp">'+STD.grupper.map(function(g){return '<option value="'+esc(g.navn)+'"'+(gk(g.navn)===cur?" selected":"")+">"+esc(g.navn)+"</option>"}).join("")+"</select></div>";
   }
   var seen={},o="";evReal().forEach(function(e){var k=gk(e.g);if(!seen[k]){seen[k]=1;o+='<option value="'+esc(e.g)+'"></option>'}});
-  return '<div class="field"><label class="lbl" for="gruppe">Gruppe eller seksjon</label><input id="gruppe" class="ginp" list="grupper" maxlength="40" autocomplete="off" value="'+esc(OPP.group)+'"><datalist id="grupper">'+o+"</datalist></div>";
+  return '<div class="field"><label class="lbl" for="gruppe">Gruppe eller enhet</label><input id="gruppe" class="ginp" list="grupper" maxlength="40" autocomplete="off" value="'+esc(OPP.group)+'"><datalist id="grupper">'+o+"</datalist></div>";
 }
 
 /* ---------- Tilgang og felles lagring ----------
@@ -2854,7 +2876,7 @@ function renderStd(){
     '<p class="hint">Illustrert bruker det felles illustrerte brettet for tema uten egen illustrasjon. Med «Bare godkjente» brukes bare kort med status Godkjent i Excel-filen. Oppsummeringen er sluttskjermen der laget kan notere en refleksjon, et læringspunkt eller et forbedringsforslag.</p></section>';
   h+='<section class="panel apanel"><h2>Grupper og faste lag</h2><p class="hint">Med grupper her velger fasilitator gruppe fra en liste, og lagene er ferdig utfylt. Uten grupper skriver fasilitator inn gruppe og lag selv.</p>';
   w.grupper.forEach(function(g,i){
-    h+='<div class="grow"><label class="tf">Gruppe eller seksjon<input id="std-g-'+i+'" data-gi="'+i+'" maxlength="40" autocomplete="off" value="'+esc(g.navn)+'"></label>'+
+    h+='<div class="grow"><label class="tf">Gruppe eller enhet<input id="std-g-'+i+'" data-gi="'+i+'" maxlength="40" autocomplete="off" value="'+esc(g.navn)+'"></label>'+
       '<div class="field"><span class="lbl">Antall lag</span><div class="stepper"><button type="button" id="std-m-'+i+'" data-gn="-1" data-gi="'+i+'" aria-label="Færre lag"'+(g.lag.length<=1?" disabled":"")+">−</button><output>"+g.lag.length+
       '</output><button type="button" id="std-p-'+i+'" data-gn="1" data-gi="'+i+'" aria-label="Flere lag"'+(g.lag.length>=4?" disabled":"")+">+</button></div></div>"+
       '<div class="glag">'+g.lag.map(function(nm,j){return '<label class="tf">Lag '+(j+1)+'<input id="std-g-'+i+"-l-"+j+'" data-gi="'+i+'" data-li="'+j+'" maxlength="24" autocomplete="off" value="'+esc(nm)+'"></label>'}).join("")+"</div>"+
@@ -2889,7 +2911,7 @@ function stdRemove(){
 var LIBC=null, LIBP=null, libBusy=false;
 function libPack(){
   var rev=Date.now().toString(36),docs=[],ids=[],boards={};
-  LIB.themes.forEach(function(t,i){var id="t"+rev+"-"+i;ids.push(id);var dd={rev:rev,id:t.id,name:t.name,desc:t.desc||"",board:t.board,kort:JSON.stringify(t.cards)};if(t.nl)dd.nl=1;docs.push([id,dd])});
+  LIB.themes.forEach(function(t,i){var id="t"+rev+"-"+i;ids.push(id);var dd={rev:rev,id:t.id,name:t.name,desc:t.desc||"",board:t.board,kort:JSON.stringify(t.cards)};if(t.nl)dd.nl=1;if(t.kat)dd.kat=t.kat;docs.push([id,dd])});
   Object.keys(LIB.boards).forEach(function(k){var b=LIB.boards[k];boards[k]={name:b.name,file:b.file,lenker:bLenker(b),pts:b.pts};if(b.tegnet)boards[k].tegnet=1;if(b.n)boards[k].n=b.n;if(bSoner(b).length)boards[k].soner=bSoner(b);if(b.nr)boards[k].nr=1;if(b.pub)boards[k].pub=1});
   return{docs:docs,indeks:{v:1,rev:rev,fil:LIB.file||"",naar:Date.now(),tema:ids,brett:JSON.stringify(boards),konf:JSON.stringify(LIB.konf||{})}};
 }
@@ -2916,7 +2938,7 @@ function libUnpack(ix,by){
         var nc={sq:typeof c.sq==="number"&&c.sq>=1&&c.sq<=n?c.sq:null,t:txt(c.t)||txt(d.name),s:txt(c.s),o:o,r:txt(c.r)||"Hva tar vi med oss fra dette?"};
         if(ty)nc.ty=ty;if(typeof c.so==="number"&&c.so>=1)nc.so=c.so;
         if(txt(c.f))nc.f=txt(c.f).slice(0,160);if(txt(c.id))nc.id=txt(c.id).slice(0,40);nc.st=c.st==="godkjent"?"godkjent":"utkast";cards.push(nc)});
-      if(cards.length){var nt={id:key(d.id),name:txt(d.name)||key(d.id),desc:txt(d.desc),board:d.board,cards:cards};if(d.nl)nt.nl=true;themes.push(nt)}});
+      if(cards.length){var nt={id:key(d.id),name:txt(d.name)||key(d.id),desc:txt(d.desc),board:d.board,cards:cards};if(d.nl)nt.nl=true;if(txt(d.kat))nt.kat=txt(d.kat).slice(0,40);themes.push(nt)}});
     var kf={};try{kf=cleanKonf(JSON.parse(ix.konf||"{}"))}catch(e){}
     return themes.length?{src:"felles",file:txt(ix.fil),when:+ix.naar||0,themes:themes,boards:boards,warn:[],konf:kf}:null;
   }catch(e){return null}
@@ -3157,7 +3179,7 @@ function aiData(u){
   return d;
 }
 function aiPrompt(u){
-  var P=u.P.id,hvem=P==="team"?"et team (en gruppe, seksjon eller avdeling)":P==="ledergruppe"?"en ledergruppe":"en seksjon i eiendomsdrift (drift og vedlikehold av bygg)";
+  var P=u.P.id,hvem=P==="team"?"et team (en gruppe, seksjon eller avdeling)":P==="ledergruppe"?"en ledergruppe":(BUILT.eiendomsdrift&&KONF.org===KONF0.org?"en seksjon i eiendomsdrift (drift og vedlikehold av bygg)":"en gruppe eller enhet på en arbeidsplass");
   return "Du hjelper "+hvem+" med å se tilbake på øktene sine i samtalespillet «"+KONF.navn+"». Under ligger anonymiserte, samlede data: kortene de har spilt per "+(P==="seksjon"?"tema":"sone")+", hva de valgte, avtalene og notatene de selv har skrevet, og pulsen etter øktene (1 til 5).\n\n"+
   "Oppgave: Lag en kort oppsummering som gruppa kan bruke i neste samtale. Speil det gruppa selv har sagt og avtalt, og still spørsmål tilbake.\n\nRegler:\n"+
   "- Du skal ALDRI vurdere, rangere eller gi karakter til gruppa. Ikke bruk trinn, nivåer, modenhet, skår eller ord som «svak» og «sterk» om gruppa. Ikke bruk modeller for team eller psykologisk trygghet til å plassere gruppa.\n"+
@@ -3822,7 +3844,7 @@ var splashFra=null;
 /* Velkomstbildet følger spillet: bildet til brettet i rask start, og tekster for Teamreisen. */
 var STEG={standard:[["Kast","Laget kaster terningen og lander på en rute med et dilemma."],["Diskuter og velg","Velg ett av tre svar og begrunn det. Beste svar flytter laget fram. På stiger og sklier står mer på spill."],["Ta med","Avslutt med en refleksjon, noe dere har lært, eller et forslag til forbedring. Gi en kort puls før dere går."]],
   teamreisen:[["Kast","Én felles brikke for hele ledergruppen."],["Snakk sammen","Dilemma, refleksjon, øvelse eller teamkontrakt. Velg beste svar eller gjennomfør kortet for å komme videre. En ny sone gir en milepæl."],["Ta med","Noter avtaler i teamkontrakten, og gi en kort puls på økta før dere går."]]};
-function splashBilde(img){var t=quickTema(),b=t&&LIB.boards[t.board],u=b?imgUrl(b,t):"";if(img&&u)img.src=u}
+function splashBilde(img){if(img&&KONF.forside){img.src=KONF.forside;return}var t=quickTema(),b=t&&LIB.boards[t.board],u=b?imgUrl(b,t):"";if(img&&u)img.src=u}
 STEG.team=[["Kast","Én felles brikke for hele teamet."],["Snakk sammen","Dilemma, refleksjon, øvelse eller teamkontrakt. Det er lov å stå over, og det finnes ingen fasit på hvordan dere vil ha det. En ny sone gir en milepæl."],["Ta med","Noter avtaler i teamkontrakten, og gi en kort puls på økta før dere går."]];
 function velkomstTekst(){var st=STEG[KONF.utseende==="teamreisen"?(PROF().id==="team"?"team":"teamreisen"):"standard"];
   st.forEach(function(x,i){var el=$("steg-"+(i+1));if(el){el.innerHTML="<b>"+esc(x[0])+"</b>"+esc(x[1])}});splashBilde($("splash-img"))}
